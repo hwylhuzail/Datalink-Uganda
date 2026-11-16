@@ -1,0 +1,26 @@
+
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">DataLink Uganda</string>
+    <string name="app_tagline">Your connection, your rewards.</string>
+
+    <string name="welcome_title">Welcome to DataLink</string>
+    <string name="welcome_message">Discover internet opportunities and earn rewards.</string>
+
+    <string name="home_title">Home</string>
+    <string name="earn_data">Earn Free Data</string>
+    <string name="find_wifi">Find Free Wi-Fi</string>
+    <string name="daily_rewards">Daily Rewards</string>
+    <string name="invite_friends">Invite Friends</string>
+
+    <string name="reward_points">Reward Points</string>
+    <string name="data_balance">Your Data Balance</string>
+
+    <string name="claim_reward">Claim Daily Reward</string>
+    <string name="reward_claimed">Daily Reward Claimed</string>
+
+    <string name="profile">My Profile</string>
+    <string name="settings">Settings</string>
+
+</resources>
