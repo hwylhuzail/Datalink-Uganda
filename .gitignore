@@ -1,0 +1,36 @@
+
+# Android build files
+.gradle/
+build/
+**/build/
+local.properties
+*.iml
+
+# Android Studio
+.idea/
+.DS_Store
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Signing keys and secrets
+*.jks
+*.keystore
+secrets.properties
+.env
+.env.*
+!.env.example
+
+# Kotlin
+.kotlin/
+
+# Node.js and Vercel
+node_modules/
+.vercel/
+npm-debug.log*
+
+# Supabase temporary files
+supabase/.temp/
+
+# Generated files
+*.log
