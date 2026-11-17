@@ -1,0 +1,50 @@
+name: Vercel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: node --test api/hotspots.test.js
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain skipped deployment
+        if: ${{ vars.VERCEL_CONFIGURED != 'true' }}
+        run: echo "Vercel deploy skipped. Set VERCEL_CONFIGURED=true and configure VERCEL_TOKEN, VERCEL_ORG_ID, and VERCEL_PROJECT_ID repository secrets."
+      - uses: actions/checkout@v4
+        if: ${{ vars.VERCEL_CONFIGURED == 'true' }}
+      - name: Check deployment secrets
+        if: ${{ vars.VERCEL_CONFIGURED == 'true' }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_ORG_ID" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::error::Vercel deployment requires VERCEL_TOKEN, VERCEL_ORG_ID, and VERCEL_PROJECT_ID GitHub Actions secrets."
+            exit 1
+          fi
+      - name: Deploy production site and API
+        if: ${{ vars.VERCEL_CONFIGURED == 'true' }}
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          mkdir -p .vercel
+          printf '{"orgId":"%s","projectId":"%s"}' "$VERCEL_ORG_ID" "$VERCEL_PROJECT_ID" > .vercel/project.json
+          npx --yes vercel@latest deploy --prod --yes --token "$VERCEL_TOKEN"

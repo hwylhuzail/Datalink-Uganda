@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Find OpenStreetMap-mapped public Wi-Fi locations in Uganda and save listings offline in the Android app."
+    >
+    <title>DataLink Uganda | Mapped Wi-Fi</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        color: #101b35;
+        background: #f4f7fb;
+      }
+      body { max-width: 760px; margin: 0 auto; padding: 28px 18px 48px; }
+      header, main { background: white; border-radius: 18px; padding: 24px; }
+      header { background: #101b35; color: white; }
+      h1 { margin: 0 0 8px; }
+      p { line-height: 1.55; }
+      button {
+        border: 0; border-radius: 10px; padding: 12px 18px;
+        background: #16a86f; color: white; font: inherit; font-weight: 650;
+      }
+      button:disabled { opacity: .65; }
+      #status { min-height: 24px; }
+      #results { list-style: none; padding: 0; }
+      #results li { border-top: 1px solid #e6eaf0; padding: 14px 0; }
+      #results a { color: #096b4c; }
+      .disclaimer, footer { color: #526078; font-size: .9rem; }
+      footer { padding: 16px 4px; }
+      @media (max-width: 520px) { body { padding: 14px 10px 32px; } }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>DataLink Uganda</h1>
+      <p>Find mapped Wi-Fi locations nearby. Refresh online, then keep the Android app's saved listings available offline.</p>
+    </header>
+    <main>
+      <h2>Nearby listings</h2>
+      <p>Share your location to request OpenStreetMap listings within 5 km. Your coordinates are used for that search.</p>
+      <button id="search" type="button">Find mapped Wi-Fi</button>
+      <p id="status" role="status" aria-live="polite"></p>
+      <ul id="results"></ul>
+      <p class="disclaimer">
+        Listings are community-mapped, may be incomplete or out of date, and do not guarantee
+        that Wi-Fi is free, available, or safe. Confirm access with the venue. Data ©
+        <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>,
+        available under the ODbL.
+      </p>
+    </main>
+    <footer>DataLink does not provide internet service, airtime, or carrier access.</footer>
+    <script>
+      const searchButton = document.querySelector("#search");
+      const status = document.querySelector("#status");
+      const results = document.querySelector("#results");
+
+      searchButton.addEventListener("click", () => {
+        if (!navigator.geolocation) {
+          status.textContent = "Location is not supported by this browser.";
+          return;
+        }
+
+        searchButton.disabled = true;
+        status.textContent = "Getting your location…";
+        results.replaceChildren();
+
+        navigator.geolocation.getCurrentPosition(async ({ coords }) => {
+          status.textContent = "Loading community-mapped listings…";
+          try {
+            const parameters = new URLSearchParams({
+              lat: coords.latitude,
+              lon: coords.longitude,
+              radius: 5000,
+            });
+            const response = await fetch(`/api/hotspots?${parameters}`);
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || "Could not load listings.");
+
+            status.textContent = data.hotspots.length
+              ? `${data.hotspots.length} mapped location(s).`
+              : "No mapped Wi-Fi locations found within 5 km.";
+            for (const hotspot of data.hotspots) {
+              const item = document.createElement("li");
+              const title = document.createElement("strong");
+              title.textContent = hotspot.name;
+              item.append(title);
+              if (hotspot.address) item.append(document.createTextNode(` — ${hotspot.address}`));
+              const map = document.createElement("a");
+              map.href = `https://www.openstreetmap.org/?mlat=${hotspot.lat}&mlon=${hotspot.lon}#map=18/${hotspot.lat}/${hotspot.lon}`;
+              map.textContent = " Open map";
+              item.append(map);
+              results.append(item);
+            }
+          } catch (error) {
+            status.textContent = error.message || "Could not load listings. Try again later.";
+          } finally {
+            searchButton.disabled = false;
+          }
+        }, (error) => {
+          status.textContent = error.message || "Location is unavailable. Check browser permissions.";
+          searchButton.disabled = false;
+        }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 });
+      });
+    </script>
+  </body>
+</html>

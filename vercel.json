@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/hotspots.js": {
+      "maxDuration": 30
+    }
+  }
+}

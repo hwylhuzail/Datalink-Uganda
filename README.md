@@ -1,69 +1,61 @@
-DataLink Uganda 🇺🇬
+# DataLink Uganda
 
-Connecting everyone to affordable and accessible internet.
+DataLink Uganda is an Android app and small Vercel site for finding Wi-Fi locations mapped in OpenStreetMap. The Android app downloads listings for the user's current area and stores the most recent result on-device for offline viewing.
 
-DataLink Uganda is an Android application designed to help users discover free internet access opportunities and earn legitimate mobile data rewards.
+## What this release does
 
-🚀 Core Features
+- Searches mapped Wi-Fi within 5 km of the device in Uganda.
+- Uses Android's available internet connection; it does not provide mobile data, bypass carrier restrictions, or connect to a network without its access details.
+- Saves the most recently downloaded listings on the device. Refresh requires internet and location access.
+- Opens a listing's coordinates in an installed maps app.
+- Makes no promise that a listing is free, current, safe, or available. Users should confirm access with the venue.
+- Does not issue points, airtime, or data rewards.
 
-- Free Wi-Fi Discovery: Find available public Wi-Fi hotspots.
-- Earn Data: Complete sponsored activities to earn rewards.
-- Daily Rewards: Receive points through daily participation.
-- Referral System: Invite friends and earn bonus points.
-- Data Offers: Discover legitimate mobile network promotions.
-- Rewards Wallet: Track points, rewards and redemption history.
-- User Accounts: Secure registration and authentication.
+Listings are community supplied by OpenStreetMap contributors under the Open Database License (ODbL). Coverage and accuracy depend on map contributors.
 
-🛠️ Technology Stack
+## Android build
 
-Technology| Purpose
-Kotlin| Android development
-Jetpack Compose| User interface
-Supabase| Authentication and database
-Vercel| API hosting and web services
-GitHub| Source code management
-GitHub Actions| Automated Android builds
+The Android project is in `android/`. Local builds require JDK 17 and Android SDK Platform 36. Use the included Gradle wrapper:
 
-📱 Initial Target Market
+```sh
+cd android
+./gradlew testDebugUnitTest assembleDebug
+```
 
-Uganda, with support planned for:
+The debug APK is written to `android/app/build/outputs/apk/debug/app-debug.apk`.
 
-- MTN Uganda
-- Airtel Uganda
+The app queries the public Overpass API directly by default. To use the Vercel API instead, set the non-secret Gradle property `DATALINK_API_BASE_URL` to the deployed site URL, for example:
 
-🏗️ Architecture
+```sh
+./gradlew assembleDebug -PDATALINK_API_BASE_URL=https://your-project.vercel.app
+```
 
-The Android application communicates with secure backend services hosted through Vercel and Supabase.
+## Vercel site and API
 
-Actual mobile data rewards will require authorized telecom integrations or legitimate data voucher providers.
+The repository root contains a static public site (`public/`) and a serverless endpoint (`api/hotspots.js`). The endpoint validates Uganda coordinates, limits search radius, queries OpenStreetMap, and returns ODbL attribution. Vercel can deploy this repository from its root directory.
 
-🔐 Security
+To enable GitHub Actions deployments, configure the following repository settings:
 
-- Secure user authentication.
-- Server-side reward validation.
-- Protected API credentials.
-- Prevention of duplicate reward claims.
-- User data protection.
+- Repository variable `VERCEL_CONFIGURED=true`
+- Repository secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID`
 
-📅 Development Status
+The Vercel workflow otherwise reports that deployment was skipped. The deployment requires a Vercel project linked to this repository and valid credentials.
 
-Project status: Initial development.
+After deployment, the optional repository variable `DATALINK_API_BASE_URL` can point Android builds at the Vercel API. Without it, Android queries the public Overpass endpoints directly and tries a second endpoint if the first is unavailable.
 
-Development will proceed in stages:
+Run API tests locally with Node.js:
 
-1. Android foundation.
-2. Authentication.
-3. Main dashboard.
-4. Rewards engine.
-5. Wi-Fi discovery.
-6. Referral system.
-7. Telecom integrations.
-8. Testing and release.
+```sh
+node --test api/hotspots.test.js
+```
 
-🎯 Project Vision
+## Android release signing
 
-To make internet access more accessible by connecting users with legitimate free internet opportunities and rewarding their participation.
+Pull requests and pushes to `main` build and upload an unsigned debug APK. To publish a signed APK from a version tag such as `v1.0.0`, add these repository secrets:
 
----
+- `ANDROID_KEYSTORE_BASE64` — base64-encoded release keystore
+- `ANDROID_KEYSTORE_PASSWORD`
+- `ANDROID_KEY_ALIAS`
+- `ANDROID_KEY_PASSWORD`
 
-DataLink Uganda — Your connection, your rewards.
+Create and safeguard your own release key before publishing. The tagged release workflow fails with a clear error if any signing secret is missing; the keystore and passwords must never be committed. A GitHub release is created with the signed APK after the build succeeds.

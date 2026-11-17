@@ -1,26 +1,22 @@
-
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <string name="app_name">DataLink Uganda</string>
-    <string name="app_tagline">Your connection, your rewards.</string>
-
-    <string name="welcome_title">Welcome to DataLink</string>
-    <string name="welcome_message">Discover internet opportunities and earn rewards.</string>
-
-    <string name="home_title">Home</string>
-    <string name="earn_data">Earn Free Data</string>
-    <string name="find_wifi">Find Free Wi-Fi</string>
-    <string name="daily_rewards">Daily Rewards</string>
-    <string name="invite_friends">Invite Friends</string>
-
-    <string name="reward_points">Reward Points</string>
-    <string name="data_balance">Your Data Balance</string>
-
-    <string name="claim_reward">Claim Daily Reward</string>
-    <string name="reward_claimed">Daily Reward Claimed</string>
-
-    <string name="profile">My Profile</string>
-    <string name="settings">Settings</string>
+    <string name="app_tagline">Find mapped Wi-Fi nearby.</string>
+    <string name="location_permission_required">Allow location access to search for nearby mapped Wi-Fi.</string>
+    <string name="hotspots_title">Find mapped Wi-Fi nearby</string>
+    <string name="hotspots_description">Your location is used to request mapped Wi-Fi within 5 km. Listings may be incomplete, out of date, paid, or unavailable; confirm access with the venue.</string>
+    <string name="refresh_hotspots">Refresh nearby listings</string>
+    <string name="searching_hotspots">Searching…</string>
+    <string name="open_directions">Open directions</string>
+    <string name="maps_app_not_found">No maps app or browser is available on this device.</string>
+    <string name="openstreetmap_attribution">Source: OpenStreetMap contributors</string>
+    <string name="saved_offline_listings">Saved on this device: %1$s. These listings remain available offline.</string>
+    <string name="empty_hotspot_cache">No saved listings yet. Connect to the internet and refresh to save nearby data for offline use.</string>
+    <string name="empty_hotspot_search">No mapped Wi-Fi listings were found in this search area. Try again later.</string>
+    <string name="hotspot_access_fee">Access fee: %1$s</string>
+    <string name="hotspot_access_fee_unknown">Access cost not listed</string>
+    <string name="hotspot_distance_meters">%1$d m away</string>
+    <string name="hotspot_distance_kilometers">%1$.1f km away</string>
 
 </resources>

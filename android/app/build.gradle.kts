@@ -21,11 +21,29 @@ android {
 
         testInstrumentationRunner =
             "androidx.test.runner.AndroidJUnitRunner"
+
+        val hotspotApiBaseUrl =
+            providers.gradleProperty("DATALINK_API_BASE_URL").getOrElse("")
+        buildConfigField(
+            "String",
+            "HOTSPOT_API_BASE_URL",
+            "\"${hotspotApiBaseUrl.replace("\\", "\\\\").replace("\"", "\\\"")}\""
+        )
+    }
+
+    signingConfigs {
+        create("release") {
+            System.getenv("ANDROID_KEYSTORE_PATH")?.let { storeFile = file(it) }
+            storePassword = System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("ANDROID_KEY_ALIAS")
+            keyPassword = System.getenv("ANDROID_KEY_PASSWORD")
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -60,8 +78,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
 
-    // Navigation
-    implementation("androidx.navigation:navigation-compose:2.8.9")
+    // Asynchronous network and location work
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     // Debug tools
     debugImplementation("androidx.compose.ui:ui-tooling")
